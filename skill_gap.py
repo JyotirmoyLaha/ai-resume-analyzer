@@ -39,8 +39,6 @@ SKILL_PRIORITY: Dict[str, str] = {
 
     # Data / AI
     "machine_learning": "critical",
-    "pandas": "critical",
-    "numpy": "high",
     "deep_learning": "high",
     "nlp": "high"
 }
@@ -61,6 +59,18 @@ LEARNING_RESOURCES: Dict[str, str] = {
     "fastapi": "https://fastapi.tiangolo.com/tutorial/",
     "postgresql": "https://www.postgresql.org/docs/current/tutorial.html"
 }
+
+# ==================================================
+# PRIORITY WEIGHTING (FOR REALISTIC SCORING)
+# ==================================================
+
+def _priority_weight(priority: str) -> int:
+    return {
+        "critical": 3,
+        "high": 2,
+        "medium": 1,
+        "low": 0
+    }.get(priority, 0)
 
 # ==================================================
 # CORE SKILL GAP ANALYSIS
@@ -86,7 +96,7 @@ def analyze_skill_gap(
         )
 
     # ---------- Skill Extraction ----------
-    candidate_skills: Set[str] = set(extract_skills(resume_text, role=role))
+    candidate_skills: Set[str] = set(extract_skills(resume_text))
     required_skills: Set[str] = ROLE_SKILLS[role]
 
     # ---------- Comparison ----------
@@ -94,11 +104,19 @@ def analyze_skill_gap(
     missing_skills = required_skills - candidate_skills
     extra_skills = candidate_skills - required_skills
 
-    # ---------- Scoring ----------
-    total_required = len(required_skills)
+    # ---------- Weighted Scoring ----------
+    total_score = 0
+    earned_score = 0
+
+    for skill in required_skills:
+        weight = _priority_weight(SKILL_PRIORITY.get(skill, "low"))
+        total_score += weight
+        if skill in candidate_skills:
+            earned_score += weight
+
     match_percentage = (
-        round((len(matched_skills) / total_required) * 100, 2)
-        if total_required > 0 else 0.0
+        round((earned_score / total_score) * 100, 2)
+        if total_score > 0 else 0.0
     )
 
     # ---------- Priority Classification ----------
@@ -119,6 +137,7 @@ def analyze_skill_gap(
         priority_breakdown["high"],
         role
     )
+    
 
     # ---------- Result ----------
     result: Dict[str, Any] = {
@@ -130,7 +149,7 @@ def analyze_skill_gap(
         "missing_skills": sorted(missing_skills),
         "extra_skills": sorted(extra_skills),
 
-        "total_required": total_required,
+        "total_required": len(required_skills),
         "total_matched": len(matched_skills),
         "total_missing": len(missing_skills),
 
@@ -148,12 +167,62 @@ def analyze_skill_gap(
             for skill in missing_skills
             if skill in LEARNING_RESOURCES
         }
+    result["career_feedback"] = generate_career_feedback(result)
 
     return result
+
+
+# ==================================================
+# Feedback Generator
+# ==================================================
+def generate_career_feedback(result: Dict[str, Any]) -> str:
+    role = result["role"]
+    match = result["match_percentage"]
+    critical = result["priority_breakdown"]["critical"]
+    high = result["priority_breakdown"]["high"]
+    medium = result["priority_breakdown"]["medium"]
+
+    if match >= 85:
+        feedback = (
+            f"You are strongly prepared for the {role} role. "
+            "Your core skills align well with industry expectations."
+        )
+    elif match >= 65:
+        feedback = (
+            f"You are moderately prepared for the {role} role, "
+            "but strengthening a few areas will significantly improve your chances."
+        )
+    else:
+        feedback = (
+            f"You are currently underprepared for the {role} role. "
+            "Focused upskilling is recommended before applying."
+        )
+
+    if critical:
+        feedback += (
+            f" Critical gaps detected in {', '.join(critical)}. "
+            "These should be your top priority."
+        )
+
+    if high:
+        feedback += (
+            f" Adding {', '.join(high[:2])} will greatly strengthen your profile."
+        )
+
+    if not critical and not high:
+        feedback += " You meet all major expectations for this role."
+
+    return feedback
 
 # ==================================================
 # HELPERS
 # ==================================================
+
+def get_available_roles() -> List[str]:
+    """
+    Return all supported job roles.
+    """
+    return sorted(ROLE_SKILLS.keys())
 
 def _get_rating(percentage: float) -> str:
     """Convert percentage to human-readable rating."""
@@ -167,7 +236,6 @@ def _get_rating(percentage: float) -> str:
         return "Fair ⭐⭐"
     return "Needs Improvement ⭐"
 
-
 def _generate_recommendations(
     critical: List[str],
     high: List[str],
@@ -178,17 +246,17 @@ def _generate_recommendations(
 
     if critical:
         recs.append(
-            f"🚨 PRIORITY: Learn critical skills first: {', '.join(critical)}"
+            f"🚨 Focus immediately on core {role} skills: {', '.join(critical)}"
         )
 
     if high:
         recs.append(
-            f"📌 IMPORTANT: Add high-impact skills: {', '.join(high[:3])}"
+            f"📈 Strengthen your profile by adding: {', '.join(high)}"
         )
 
     if not critical and not high:
         recs.append(
-            f"✅ You meet all critical requirements for the {role} role."
+            f"✅ Your resume strongly matches the {role} role requirements."
         )
 
     return recs
@@ -226,6 +294,7 @@ def get_skill_roadmap(role: str) -> Dict[str, Any]:
     Generate a learning roadmap for a role.
     """
 
+    role = role.lower().strip()
     if role not in ROLE_SKILLS:
         raise ValueError("Invalid role")
 
@@ -248,18 +317,3 @@ def get_skill_roadmap(role: str) -> Dict[str, Any]:
         "role": role,
         "roadmap": roadmap
     }
-
-# ==================================================
-# DEV TEST
-# ==================================================
-
-if __name__ == "__main__":
-    sample_resume = """
-   alex rivera 123 tech lane, san francisco, ca 94105 (555) 012-3456 | alex.rivera.dev@email.com linkedin.com/in/alexrivera | github.com/arivera-codes professional summary dynamic and detail-oriented software engineer with over 5 years of experience in full-stack development. proven track record of optimizing system performance and leading cross-functional teams to deliver scalable web applications. passionate about ai integration and cloud-native architecture. work experience senior software engineer | techflow solutions january 2021 – present • led the migration of a legacy monolithic architecture to a microservices-based system using node.js and docker, reducing deployment time by 40%. • developed and maintained restful apis for a high-traffic e-commerce platform serving over 500k monthly active users. • mentored 4 junior developers and conducted weekly code reviews to ensure high-quality standards. junior web developer | innovate web lab june 2018 – december 2020 • collaborated with ui/ux designers to implement responsive front-end components using react.js and tailwind css. • identified and resolved 50+ critical bugs in the database layer, improving application stability by 15%. • integrated third-party payment gateways (stripe, paypal) ensuring secure transaction processing. education bachelor of science in computer science state university of technology | 2014 – 2018 • gpa: 3.8/4.0 • relevant coursework: data structures, algorithms, database management, software engineering. technical skills • languages: javascript (es6+), python, java, sql, html5, css3. • frameworks/libraries: react, node.js, express, django, redux. • tools & platforms: git, aws (ec2, s3), docker, jenkins, postgresql, mongodb. • soft skills: agile methodology, problem solving, technical documentation, team leadership. projects ai-powered task manager • built a task management tool using python and openai api to automatically prioritize user tasks based on deadlines and sentiment analysis. • deployed the application on heroku with a ci/cd pipeline.
-    """
-
-    result = analyze_skill_gap(sample_resume, "backend", include_resources=True)
-    print(result)
-
-
-
