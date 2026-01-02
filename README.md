@@ -172,4 +172,4 @@ BCA Student | Aspiring Software Engineer
 
 📧 Email: jyotirmoylaha713128@gmail.com
 
-🌐 Portfolio: https://jyotirmoy-portfolio.onrender.com
+🌐 Portfolio: https://ai-resume-analyzer-hhhb.onrender.com
