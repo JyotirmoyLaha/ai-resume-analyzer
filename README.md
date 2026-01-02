@@ -1,2 +1,14 @@
-# ai-resume-analyzer
-AI-powered Resume Analyzer &amp; Skill Gap Finder using Python
+# AI Resume Analyzer & Skill Gap Finder
+
+A Python-based project that analyzes resumes, extracts skills, and identifies skill gaps based on target roles.
+
+## Features
+- Resume parsing (PDF / DOCX)
+- Skill extraction using keyword & rule-based logic
+- Skill gap analysis for different job roles
+
+## Tech Stack
+- Python
+
+## Status
+🚧 Work in progress
