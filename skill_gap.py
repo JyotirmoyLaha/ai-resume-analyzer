@@ -57,7 +57,17 @@ LEARNING_RESOURCES: Dict[str, str] = {
     "sql": "https://www.w3schools.com/sql/",
     "django": "https://docs.djangoproject.com/en/stable/intro/",
     "fastapi": "https://fastapi.tiangolo.com/tutorial/",
-    "postgresql": "https://www.postgresql.org/docs/current/tutorial.html"
+    "postgresql": "https://www.postgresql.org/docs/current/tutorial.html",
+    "flask": "https://flask.palletsprojects.com/en/2.3.x/tutorial/",
+    "nextjs": "https://nextjs.org/learn",
+    "kubernetes": "https://kubernetes.io/docs/tutorials/",
+    "machine_learning": "https://www.coursera.org/learn/machine-learning",
+    "deep_learning": "https://www.deeplearning.ai/deep-learning-specialization/",
+    "nlp": "https://www.coursera.org/learn/natural-language-processing",
+    "git": "https://git-scm.com/docs/gittutorial",
+    "typescript": "https://www.typescriptlang.org/docs/",
+    "ci_cd": "https://www.redhat.com/en/topics/devops/what-is-ci-cd",
+    "tailwind": "https://tailwindcss.com/docs/installation",
 }
 
 # ==================================================
@@ -317,3 +327,4 @@ def get_skill_roadmap(role: str) -> Dict[str, Any]:
         "role": role,
         "roadmap": roadmap
     }
+
