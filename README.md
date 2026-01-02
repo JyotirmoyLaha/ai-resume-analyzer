@@ -80,9 +80,6 @@ ai-resume-analyzer/
 ├── skill_gap.py # Analysis, scoring, recommendations & roadmap
 └── README.md
 
-yaml
-Copy code
-
 ---
 
 ## ⚙️ How It Works (Pipeline)
@@ -111,9 +108,10 @@ analysis = analyze_skill_gap(
 )
 
 print(analysis)
-📈 Sample Output
-json
-Copy code
+---
+
+## Sample Output
+
 {
   "role": "backend",
   "match_percentage": 72.5,
@@ -130,7 +128,11 @@ Copy code
     "🚨 Focus immediately on core backend skills: docker, aws"
   ]
 }
-🧠 Why This Project Is Different
+```
+
+
+## 🧠 Why This Project Is Different
+
 ❌ No black-box AI hype
 
 ✅ Transparent, explainable logic
@@ -142,6 +144,7 @@ Copy code
 ✅ Designed like a real hiring tool
 
 🛠 Tech Stack
+
 Python 3
 
 pdfplumber
@@ -151,6 +154,7 @@ Regular Expressions
 Typed functions & modular design
 
 🔮 Future Improvements
+
 Resume section weighting (Experience > Projects > Skills)
 
 Skill proficiency detection
@@ -162,9 +166,10 @@ Web UI (Streamlit / Flask)
 ML-based skill inference (Phase 2)
 
 👨‍💻 Author
+
 Jyotirmoy Laha
 BCA Student | Aspiring Software Engineer
 
 📧 Email: jyotirmoylaha713128@gmail.com
-🌐 Portfolio: https://jyotirmoy-portfolio.onrender.com
 
+🌐 Portfolio: https://jyotirmoy-portfolio.onrender.com
